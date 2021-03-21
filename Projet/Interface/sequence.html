@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+	<meta charset="UTF-8">
+	<title>Sequence</title>
+	<style type="text/css">
+* {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+	color: #eee;
+}
+:root {
+	--stg-bpm: 120;
+	--stg-TSN: 4;
+	--stg-TSD: 4;
+
+	--seq-len: 64;
+
+	--instrum-color: #409fff;
+	--instrum-octvOfst: 0;
+
+	--note-width: 50px;
+	--note-height: 2.778%;
+}
+body {
+	width: 100vw;
+	height: 100vh;
+	background: #333;
+}
+input {
+	color: black;
+}
+/*---------------------------------------------*/
+
+.sequence, .sequence>div {
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	top: 0;
+}
+#track {
+	background-image: url("sequencer_bg_basic16-1.svg");
+}
+.note {
+	width: var(--note-width);
+	height: var(--note-height);
+	border: 2px solid #00FE3F;
+	position: absolute;
+	background-color: rgba(0, 254, 63, .5);
+	transition: width .5s linear;
+}
+	</style>
+	<script type="text/javascript">
+		let root = document.documentElement;
+		let meloDiv;
+
+		let strPit = "47 47 49 49 50 50 52 52 54 54 50 50 54 54 54 54 53 53 49 49 53 53 53 53 52 52 48 48 52 52 52 52 47 47 49 49 50 50 52 52 54 54 50 50 54 54 59 59 57 57 54 54 50 50 54 54 57 57 57 57 57 57 57 57 54 54 56 56 58 58 59 59 61 61 58 58 61 61 61 61 62 62 58 58 62 62 62 62 61 61 58 58 61 61 61 61 54 54 56 56 58 58 59 59 61 61 58 58 61 61 61 61 62 62 58 58 62 62 62 62 61 61 61 61 61 61 61 61";
+		let strVel = "57 0 56 0 59 0 58 0 62 0 61 0 65 0 0 0 67 0 64 0 72 0 0 0 60 0 56 0 62 0 0 0 59 0 61 0 62 0 63 0 63 0 60 0 61 0 67 0 59 0 57 0 62 0 58 0 58 0 0 0 0 0 0 0 56 0 64 0 64 0 64 0 62 0 61 0 67 0 0 0 71 0 59 0 62 0 0 0 57 0 53 0 62 0 0 0 56 0 57 0 53 0 65 0 62 0 62 0 67 0 0 0 70 0 56 0 63 0 0 0 62 0 0 0 0 0 0 0";
+		let strDur = "6 0 6 0 6 0 6 0 6 0 6 0 12 0 6 0 6 0 6 0 12 0 6 0 6 0 6 0 12 0 6 0 6 0 6 0 6 0 6 0 6 0 6 0 6 0 6 0 6 0 6 0 6 0 6 0 24 0 6 0 6 0 6 0 6 0 6 0 6 0 6 0 6 0 6 0 12 0 6 0 6 0 6 0 12 0 6 0 6 0 6 0 12 0 6 0 6 0 6 0 6 0 6 0 6 0 6 0 12 0 6 0 6 0 6 0 12 0 6 0 24 0 6 0 6 0 6 0";
+
+		let listPit, listVel, listDur, listElm = [];
+		
+		function start() {
+			meloDiv = document.getElementsByClassName("melody")[0];
+
+			loadMelody(listPit, listVel, listDur);
+			console.log(listPit, listVel, listDur, listPit.length);
+		}
+
+		function loadMelody(pit,vel,dur) {
+			listPit = strPit.split(" ");
+			listVel = strVel.split(" ");
+			listDur = strDur.split(" ");
+
+			root.style.setProperty('--seq-len', listPit.length);
+			for (let i = 0; i < listPit.length; i++) {
+				// console.log("registering note "+ i);
+				listElm[i] = new Note(i, listPit[i], listVel[i], listDur[i]);
+			}
+			// console.log(listElm);
+		}
+		function regNote(pos, pit, vel, dur) {
+			var note = listElm[pos];
+
+			console.log("register the note "+ pos);
+			note.update(pit, vel, dur);
+		}
+		function uIRegNote() {
+			form = document.getElementsByClassName("form")[0];
+			iptPos = form.children[0].value;
+			iptPit = form.children[1].value;
+			iptVel = form.children[2].value;
+			iptDur = form.children[3].value;
+			
+			/*console.log("User requested a note registration",
+									"at postion "+ iptPos,
+									"with pitch "+ iptPit,
+									"with velocity "+ iptVel,
+									"with duration "+ iptDur);*/
+			regNote(iptPos,iptPit,iptVel,iptDur);
+		}
+
+		function Note(pos,pit,vel,dur) {
+			self = this;
+			this.pos = pos;
+			this.pit = pit;
+			this.vel = vel;
+			this.dur = dur;
+
+			this.active = false;
+			this.div = document.createElement("div");
+			this.div.id = "note"+ this.pos;
+			this.div.setAttribute("class","note");
+			this.div.innerHTML= "";
+			this.div.style.left = this.pos * 50 +"px";
+
+			this.update = function (nPit = self.pit, nVel = self.vel, nDur = self.dur) {
+				self.pit = nPit;
+				self.vel = nVel;
+				self.dur = nDur;
+
+				console.log("updating note "+ this.pos +"...");
+				if (self.vel > 0) {
+					if (!this.active) {
+						console.log("appending note "+ this.pos +" to melody...");
+						meloDiv.appendChild(this.div);
+						this.active = true;
+					}
+					console.log("adjusting note "+ this.pos +"'s style...");
+					this.div.style.bottom = (nPit - 36) / .36 +"%";
+					console.log("note "+ this.pos +"'s bottom is "+ this.div.style.bottom);
+					this.div.style.backgroundColor = "rgba(0, 254, 63, "+ nVel / 127 +")";
+					console.log("note "+ this.pos +"'s background color is "+ this.div.style.backgroundColor);
+					this.div.style.width = nDur * 12.5 +"px";
+					console.log("note "+ this.pos +"'s width is "+ this.div.style.width);
+				} else {
+					if (this.active) {
+						console.log("removing note "+ this.pos +"...");
+						this.remove();
+						this.active = false;
+					}
+				}
+				console.log("done updating "+ this.pos +"!");
+			}
+
+			this.remove = function() {
+				meloDiv.removeChild(this.div);
+			}
+			this.update();
+		}
+	</script>
+</head>
+<body onload="start();">
+<div class="form">
+	<input type="number" class="ipt idx" value="0">
+	<input type="number" class="ipt pit" value="48" min="36" max="72">
+	<input type="number" class="ipt vel" value="63" min="0" max="127">
+	<input type="number" class="ipt dur" value="4" min="0">
+	<input type="submit" value="Register" onclick="uIRegNote()">
+</div>
+<div class="sequence">
+	<!-- <div class="track">
+
+	</div> -->
+	<div class="melody">
+	</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" stroke="#53d58d" stroke-width="2" fill="#444">
+	<defs>
+		<radialGradient id="flash" r="50%">
+			<stop offset="0.1" stop-color="#FEffff"/>
+			<stop offset="0.5" stop-color="#FE3F00" stop-opacity=".6"/>
+			<stop offset="1" stop-color="#FE3F00" stop-opacity="0"/>
+			<animate attributeName="r" values="40%;50%;40%" dur="1s" repeatCount="indefinite" calcMode="spline"
+			keySplines="0.5 0 0.5 1 ; .5 0 0.5 1"/>
+		</radialGradient>
+	</defs>
+	<circle cx="32" cy="32" r="30"/>
+	<circle cx="32" cy="32" r="16" fill="#511"/>
+	<circle class="flash" cx="32" cy="32" r="28" stroke="none" fill="url(#flash)"/>
+</svg>

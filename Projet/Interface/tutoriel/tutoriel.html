@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+	<meta charset="UTF-8">
+	<title>Manuel d'utilisation</title>
+	<link rel="stylesheet" href="style/concerto.css">
+	<style>
+		@font-face {
+			font-family: "Roboto";
+			src: url(style/Roboto-Regular.ttf);
+		}
+		:root {
+			--color-stroke: var(--color-widget);
+			--color-fill: var(--color-widget);
+			--alpha-stroke: .5;
+			--alpha-fill: .15;
+			--line-width: 1px;
+			font-family: "Roboto", sans-serif;
+		}
+		* {
+			box-sizing: border-box;
+			/* margin: 0;
+			padding: 0; */
+			color: var(--color-text);
+		}
+		body {
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: space-between;
+			background: var(--color-background);
+		}
+		section {
+			border: var(--line-width) solid var(--color-stroke);
+			background: inherit;
+		}
+		h1, h3 {
+			display: inline-block;
+			margin: 10px 0;
+			padding: 5px;
+			position: relative;
+		}
+		h1::before, h3::before, h1::after, h3::after {
+			content: '';
+			position: absolute;
+			top:0;left:0;bottom:0;right:0;
+		}
+		h1::after, h3::after {
+			border: var(--line-width) solid var(--color-stroke);
+			opacity: var(--alpha-stroke)
+		}
+		h1::before, h3::before {
+			background: var(--color-fill);
+			opacity: var(--alpha-fill);
+			z-index: -2
+		}
+		h2 {
+			padding: 5px;
+			position: sticky;
+			top: 0;
+			background: var(--color-background);
+			z-index: 1;
+		}
+		h3>img {
+			margin-left: .2em;
+			height: 1.2em;
+			vertical-align:text-bottom
+		}
+		a {color: var(--color-widget)}
+		hr {margin: 40px 0}
+
+		#tuto_intro {
+			display: flex;
+			padding: 0 10px;
+			position: absolute;
+			flex-direction: column;
+			top: 0; left: 0; bottom: 50%; right: 0;
+			z-index: 1;
+		}
+		#intro_scroll {
+			height: 100%;
+			overflow-y: scroll;
+		}
+		#intro_scroll>ul, .sub_cmd {list-style-type: none}
+		li>h3 {margin-left: -20px}
+
+		#tuto_interface {
+			display: flex;
+			position: fixed;
+			top: 50%; left: 0; right: 0; bottom: 0;
+		}
+		#interface_cont {
+			position: relative;
+			width: 90vmin;
+			height: 45vh;
+			left: 50%;
+			top: 50%;
+			transform: translate(-50%, -50%);
+		}
+		#interface_cont>* {position: absolute}
+	
+		@media only screen and (min-width: 120vh) {
+			#tuto_intro {
+				top: 0; left: 0; bottom: 0; right: calc(80vw - 20vh);
+			}
+			#tuto_interface {
+				top: 0; left: calc(20vw + 20vh); right: 0; bottom: 0;
+			}
+			#interface_cont {
+				width: calc(75vw - 20vh);
+				height: 90vh;
+			}
+		}
+		#interface {
+			position: absolute;
+			width: 100%;
+			top: 0; left: 0; right: 0; bottom: 0;
+		}
+	</style>
+</head>
+<body>
+	<section id="tuto_intro">
+		<h1>Comment utiliser le Sequencer?</h1>
+		<div id="intro_scroll">
+			<h2>Unités</h2>
+			<ul>
+				<li><h3 id="unit_note">Note</h3>
+					<p>Une note est la plus petite unité dans le sequencer.</p>
+					<p>Par défaut, vous jouez avec le <a href="#cmd_keyboard">clavier</a> des notes noires qui valent 2 notes. (voir la commande <a href="#cmd_snap">pas</a>)</p>
+				</li>
+				<li><h3 id="unit_beat">Battement (beat)</h3>
+					<p>Un battement vaut par défaut 1/4 d'une longueur (une longueur vaut 16 <a href="#unit_note">notes</a>, donc un battement dure 4 <a href="#unit_note">notes</a>).</p>
+					<p>Un 'tak' de métronome signifie qu'un battement est passé.</p>
+					<p>Vous pouvez déterminer la longueur d'un battement avec le <a href="#cmd_ts_d">dénominateur</a> (voir la commande <a href="#cmd_ts">signature temporelle</a>).</p>
+				</li>
+				<li><h3 id="unit_measure">Mesure</h3>
+					<p>Une mesure vaut par défaut 4 <a href="#unit_beat">battements</a></p>
+					<p>Un 'tik' de métronome signifie qu'une mesure est passé.</p>
+					<p>Vous pouvez déterminer la longueur d'une mesure avec le <a href="#cmd_ts_n">numérateur</a> (voir la commande <a href="#cmd_ts">signature temporelle</a>).</p>
+				</li>
+				<li><h3 id="unit_page">Page (boucle)</h3>
+					<p>Une page (ou une boucle) comprend par défaut 2 <a href="#unit_measure">mesures</a>.</p>
+					<p>Quand le <a href="#ind_cursor">curseur</a> atteint la fin de la page, il reprend au début de la page.</p>
+					<p>Quand une page est tournée (voir la commande <a href="#cmd_pg">page</a>), le <a href="#ind_cursor">curseur</a> saute avec la page.</p>
+					<p>Vous pouvez déterminer la longueur d'une page avec la commande <a href="#cmd_loop_length">longueur de page</a>.</p>
+				</li>
+				<li><h3 id="unit_sequence">Séquence</h3>
+					<p>Une séquence comprend toutes les notes jouées ainsi que les informations enregistrées à droite du <a href="#cmd_keyboard">clavier</a>, soit 
+						<ul>
+							<li>le <a href="#cmd_title">titre</a>,</li>
+							<li>l'<a href="#ind_author">auteur</a>,</li>
+							<li>le <a href="#cmd_tempo">tempo</a>,</li>
+							<li>la <a href="#cmd_ts">signature temporelle</a>,</li>
+							<li>la <a href="#cmd_loop_length">longueur de page</a>,</li>
+							<li>la <a href="#cmd_key">clé</a></li>
+							<li>et l'<a href="#cmd_wave">instrument</a>.</li>
+						</ul>
+					</p>
+					<p>Elle vaut par défaut 2 <a href="#unit_page">pages</a>.</p>
+					<p>Vous pouvez déterminer la longueur de la séquence avec les commandes <a href="#cmd_pg_add">ajouter</a> et <a href="#cmd_pg_del">déchirer</a> (voir la commande <a href="#cmd_pg">page</a>)</p>
+				</li>
+				<li><h3 id="unit_tempo">Tempo (bpm)</h3>
+					<p>Le tempo signifie la vitesse à laquelle le <a href="#ind_cursor">curseur</a> se déplace dans la <a href="#unit_sequence">séquence</a>.</p>
+					<p>Par défaut le <a href="#ind_cursor">curseur</a> passe devant 120 <a href="#unit_beat">battements</a> par minute.</p>
+					<p>Vous pouvez déterminer le tempo avec la commande <a href="#cmd_tempo">tempo</a> (duh).</p>
+				</li>
+				<li><h3 id="unit_pit">Hauteur (pitch)</h3>
+					<p>La hauteur signifie à quel point une note sonne aigu (haut) ou grave (bas).</p>
+				</li>
+				<li><h3 id="unit_vel">Vélocité</h3>
+					<p>La vélocité signifie à quel point une note sonne fort (haut) ou faible (bas).</p>
+					<p>Une note de vélocité 0 est muette.</p>
+				</li>
+				<li><h3 id="unit_dur">Durée</h3>
+					<p>La durée signifie combien de temps une note maintient sa vélocité.</p>
+				</li>
+			</ul>
+			<hr>
+			<h2>Commandes</h2>
+			<ul>
+				<li><h3 id="cmd_vol">Volume</h3>
+					<p>Vous permet de contrôler le volume en décibels produit par la <a href="#unit_sequence">séquence</a>, indépendamment du reste de Concerto</p>
+					<p>-70 DB rend le Sequencer muet</p>
+				</li>
+				<li><h3 id="cmd_keyboard">Clavier</h3>
+					<p>Vous permet d'enregister des notes dans la <a href="#unit_sequence">séquence</a></p>
+					<p>Plus vous touchez à droite, plus la note sera aigue (voir <a href="#unit_pit">hauteur</a>).</p>
+					<p>Plus vous touchez en haut, plus la note sera forte (voir <a href="#unit_vel">vélocité</a>).</p>
+					<p>Plus vous touchez longtemps, plus la note durera longtemps (voir <a href="#unit_dur">durée</a>).</p>
+				</li>
+				<li><h3 id="cmd_save">Sauvegarder <img src="icones/save.svg" alt="sauvegarder"></h3>
+					<p>Vous permet de sauvegarder votre <a href="#unit_sequence">séquence</a> dans un fichier texte.</p>
+					<p>Naviguez dans le dossier <em>Sequences</em> puis sélectionnez votre fichier débutant par <em>seq_user</em>, puis cliquez sur <em>save</em>.</p>
+					<p><strong>Note:</strong> vous ne pouvez pas sauvegarder votre <a href="#unit_sequence">séquence</a> sur le fichier <em>seq_MountainKing.txt</em>, <em>seq_RideWalkyries.txt</em> ou <em>seq_userEmpty.txt</em> car il s'agit de <a href="#unit_sequence">séquences</a> "template".</p>
+					<p><strong>Note:</strong> le nom de l'auteur sera automatiquement assigné à vous, soit Allo_Machines.</p>
+				</li>
+				<li><h3 id="cmd_open">Ouvrir <img src="icones/load.svg" alt="ouvrir"></h3>
+					<p>Vous permet d'ouvrir une <a href="#unit_sequence">séquence</a> de votre choix.</p>
+					<p>Naviguez dans le dossier <em>Sequences</em> puis sélectionnez votre fichier débutant par <em>seq_user</em>, puis cliquez sur <em>open</em>.</p>
+					<p>Vous pouvez ouvrir <em>seq_MountainKing.txt</em> ou <em>seq_RideWalkyries.txt</em> pour une <a href="#unit_sequence">séquence</a> prête à être jouée.</p>
+					<p>Vous pouvez ouvrir <em>seq_userEmpty.txt</em> (au bas de la liste) pour une <a href="#unit_sequence">séquence</a> complètement vide.</p>
+				</li>
+				<li><h3 id="cmd_revert">Recharger <img src="icones/revert.svg" alt="revert"></h3>
+					<p>Vous permet d'annuler toutes les modifications et de recharger la <a href="#unit_sequence">séquence</a> originalement chargée.</p>
+				</li>
+				<li><h3 id="cmd_info">Info <img src="icones/info.svg" alt="arrêt"></h3>
+					<p>Vous permet de lire cette superbe page.</p>
+				</li>
+				<li><h3 id="cmd_on">Jouer <img src="icones/play.svg" alt="jouer"> / arrêt <img src="icones/stop.svg" alt="arrêt"> </h3>
+					<p>Vous permet de faire défiler ou arrêter le <a href="#ind_cursor">curseur</a> dans la <a href="#unit_sequence">séquence</a></p>
+				</li>
+				<li><h3 id="cmd_title">Titre</h3>
+					<p>Vous permet de donner un nom à votre <a href="#unit_sequence">séquence</a></p>
+				</li>
+				<li><h3 id="cmd_tempo">Tempo <img src="icones/tempo.svg" alt="tempo"></h3>
+					<p>Vous permet d'ajuster la vitesse à laquelle le curseur défile dans la <a href="#unit_sequence">séquence</a> (voir <a href="#unit_tempo">tempo</a>).</p>
+				</li>
+				<li><h3 id="cmd_ts">Signature temporelle</h3>
+					<p>Vous permet de modifier la signature temporelle de la <a href="#unit_sequence">séquence</a></p>
+					<ul class="sub_cmd">
+						<li><h3 id="cmd_ts_n">Numérateur</h3>
+							<p>Détermine le nombre de <a href="#unit_beat">battements</a> dans une <a href="#unit_measure">mesure</a>.</p>
+							<p>Glissez de haut en bas pour ajuster la valeur</p>
+							<p>Double-cliquez pour remettre par défaut</p>
+						</li>
+						<li><h3 id="cmd_ts_n">Dénominateur</h3>
+							<p>Détermine la durée d'un <a href="#unit_beat">battement</a> selon une fraction de longueur (voir <a href="#unit_beat">battement</a>).</p>
+						</li>
+					</ul>
+				</li>
+			</ul>
+		</div>
+	</section>
+	<section id="tuto_interface">
+		<div id="interface_cont">
+			<img id="interface" src="interface.png" alt="disposition de l'interface">
+		</div>
+	</section>
+</body>
+</html>

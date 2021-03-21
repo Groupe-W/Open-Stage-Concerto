@@ -1,0 +1,6 @@
+[0321/115741.735:ERROR:node_debugger.cc(50)] Error parsing node options: [DEP0062]: `node --debug` and `node --debug-brk` are invalid. Please use `node --inspect` and `node --inspect-brk` instead.
+[0321/121238.779:ERROR:node_debugger.cc(50)] Error parsing node options: [DEP0062]: `node --debug` and `node --debug-brk` are invalid. Please use `node --inspect` and `node --inspect-brk` instead.
+[0321/121302.067:ERROR:node_debugger.cc(50)] Error parsing node options: [DEP0062]: `node --debug` and `node --debug-brk` are invalid. Please use `node --inspect` and `node --inspect-brk` instead.
+[0321/152838.780:ERROR:node_debugger.cc(50)] Error parsing node options: [DEP0062]: `node --debug` and `node --debug-brk` are invalid. Please use `node --inspect` and `node --inspect-brk` instead.
+[0321/170000.176:ERROR:node_debugger.cc(50)] Error parsing node options: [DEP0062]: `node --debug` and `node --debug-brk` are invalid. Please use `node --inspect` and `node --inspect-brk` instead.
+[0321/170015.311:ERROR:node_debugger.cc(50)] Error parsing node options: [DEP0062]: `node --debug` and `node --debug-brk` are invalid. Please use `node --inspect` and `node --inspect-brk` instead.
