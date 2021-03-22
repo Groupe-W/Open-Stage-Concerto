@@ -3,11 +3,11 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Manuel d'utilisation</title>
-	<link rel="stylesheet" href="style/concerto.css">
+	<link rel="stylesheet" href="concerto.css">
 	<style>
 		@font-face {
 			font-family: "Roboto";
-			src: url(style/Roboto-Regular.ttf);
+			src: url(Roboto-Regular.ttf);
 		}
 		:root {
 			--color-stroke: var(--color-widget);
@@ -41,6 +41,8 @@
 		}
 		h1::before, h3::before, h1::after, h3::after {
 			content: '';
+			width: 100%;
+			height: 100%;
 			position: absolute;
 			top:0;left:0;bottom:0;right:0;
 		}
@@ -60,6 +62,19 @@
 			background: var(--color-background);
 			z-index: 1;
 		}
+		h3 {
+			top: -50px;
+			transform: translateY(50px);
+			font-size: 1.2rem;
+			transition: top step-end 1ms;
+		}
+		:target {
+			top: 0;
+			transform: none;
+			--alpha-fill: .5;
+			--alpha-stroke: 1
+		}
+		h3:active::before {opacity: .75}
 		h3>img {
 			margin-left: .2em;
 			height: 1.2em;
@@ -89,14 +104,15 @@
 			top: 50%; left: 0; right: 0; bottom: 0;
 		}
 		#interface_cont {
+			font-size: .9vmin;
 			position: relative;
-			width: 90vmin;
-			height: 45vh;
+			width: 100em;
+			height: calc(100em / 3);
 			left: 50%;
 			top: 50%;
 			transform: translate(-50%, -50%);
 		}
-		#interface_cont>* {position: absolute}
+		#interface_cont h3 {margin: 0}
 	
 		@media only screen and (min-width: 120vh) {
 			#tuto_intro {
@@ -106,16 +122,50 @@
 				top: 0; left: calc(20vw + 20vh); right: 0; bottom: 0;
 			}
 			#interface_cont {
-				width: calc(75vw - 20vh);
-				height: 90vh;
+				font-size: calc(.75vw - .2vh);
+				width: 100em;
+				height: calc(100em / 3);
 			}
 		}
 		#interface {
-			position: absolute;
+			position: relative;
 			width: 100%;
-			top: 0; left: 0; right: 0; bottom: 0;
+			top: 50%;
+			transform: translate(0,-50%);
 		}
-	</style>
+		[class^="cmd_"], [class^="ind_"] {
+			--box-t: ;
+			--box-l: ;
+			--box-b: ;
+			--box-r: ;
+			--arw-t-lgth: 0;
+			--arw-b-lgth: 0;
+			--arw-t: 100%;
+			position: absolute;
+			top: calc(var(--box-t) - var(--arw-t-lgth));
+			left: var(--box-l);
+			bottom: calc(var(--box-b) - var(--arw-b-lgth));
+			right: var(--box-r);
+			transform: translate(-50%,-50%);
+		}
+		[class^="cmd_"]::before, [class^="ind_"]::before {
+			content: '';
+			position: absolute;
+			left: calc(50% - 2px);
+			width: 0;
+			height: 0;
+			border-width: var(--arw-t-lgth) 2px var(--arw-b-lgth);
+			border-style: solid;
+			border-color: var(--color-stroke) transparent;
+		}
+		
+		.cmd_vol {--box-t: 1%;--box-l: 3%;--arw-t-lgth: 2em}
+		.ind_pos {--box-t: 0%;--box-l: 13%;--arw-t-lgth: 9em}
+		.ind_range {--box-t: 0%;--box-l: 34%;--arw-t-lgth: 2em}
+		.cmd_save {--box-t: 1%;--box-l: 3%;--arw-t-lgth: 2em}
+
+		.cmd_keyboard {--box-b: 20%;--box-l: 3%;--arw-b-lgth: 2em}
+		</style>
 </head>
 <body>
 	<section id="tuto_intro">
@@ -139,9 +189,9 @@
 				</li>
 				<li><h3 id="unit_page">Page (boucle)</h3>
 					<p>Une page (ou une boucle) comprend par défaut 2 <a href="#unit_measure">mesures</a>.</p>
-					<p>Quand le <a href="#ind_cursor">curseur</a> atteint la fin de la page, il reprend au début de la page.</p>
-					<p>Quand une page est tournée (voir la commande <a href="#cmd_pg">page</a>), le <a href="#ind_cursor">curseur</a> saute avec la page.</p>
-					<p>Vous pouvez déterminer la longueur d'une page avec la commande <a href="#cmd_loop_length">longueur de page</a>.</p>
+					<p>Quand le <a href="#ind_pos">curseur</a> atteint la fin de la page, il reprend au début de la page.</p>
+					<p>Quand une page est tournée (voir la commande <a href="#cmd_pg">page</a>), le <a href="#ind_pos">curseur</a> saute avec la page.</p>
+					<p>Vous pouvez déterminer la longueur d'une page avec la commande <a href="#cmd_loop_length">longueur de boucle</a>.</p>
 				</li>
 				<li><h3 id="unit_sequence">Séquence</h3>
 					<p>Une séquence comprend toutes les notes jouées ainsi que les informations enregistrées à droite du <a href="#cmd_keyboard">clavier</a>, soit 
@@ -159,8 +209,8 @@
 					<p>Vous pouvez déterminer la longueur de la séquence avec les commandes <a href="#cmd_pg_add">ajouter</a> et <a href="#cmd_pg_del">déchirer</a> (voir la commande <a href="#cmd_pg">page</a>)</p>
 				</li>
 				<li><h3 id="unit_tempo">Tempo (bpm)</h3>
-					<p>Le tempo signifie la vitesse à laquelle le <a href="#ind_cursor">curseur</a> se déplace dans la <a href="#unit_sequence">séquence</a>.</p>
-					<p>Par défaut le <a href="#ind_cursor">curseur</a> passe devant 120 <a href="#unit_beat">battements</a> par minute.</p>
+					<p>Le tempo signifie la vitesse à laquelle le <a href="#ind_pos">curseur</a> se déplace dans la <a href="#unit_sequence">séquence</a>.</p>
+					<p>Par défaut le <a href="#ind_pos">curseur</a> passe devant 120 <a href="#unit_beat">battements</a> par minute.</p>
 					<p>Vous pouvez déterminer le tempo avec la commande <a href="#cmd_tempo">tempo</a> (duh).</p>
 				</li>
 				<li><h3 id="unit_pit">Hauteur (pitch)</h3>
@@ -179,6 +229,9 @@
 			<ul>
 				<li><h3 id="cmd_vol">Volume</h3>
 					<p>Vous permet de contrôler le volume en décibels produit par la <a href="#unit_sequence">séquence</a>, indépendamment du reste de Concerto</p>
+					<p>Glissez de haut en bas pour ajuster la valeur</p>
+					<p>Double-cliquez pour remettre la valeur par défaut (<strong>+0 DB</strong>)</p>
+					<p>La valeur va de <strong>-70 DB</strong> à <strong>+6 DB</strong></p>
 					<p>-70 DB rend le Sequencer muet</p>
 				</li>
 				<li><h3 id="cmd_keyboard">Clavier</h3>
@@ -187,32 +240,35 @@
 					<p>Plus vous touchez en haut, plus la note sera forte (voir <a href="#unit_vel">vélocité</a>).</p>
 					<p>Plus vous touchez longtemps, plus la note durera longtemps (voir <a href="#unit_dur">durée</a>).</p>
 				</li>
-				<li><h3 id="cmd_save">Sauvegarder <img src="icones/save.svg" alt="sauvegarder"></h3>
+				<li><h3 id="cmd_save">Sauvegarder <img src="../icones/save.svg" alt="sauvegarder"></h3>
 					<p>Vous permet de sauvegarder votre <a href="#unit_sequence">séquence</a> dans un fichier texte.</p>
 					<p>Naviguez dans le dossier <em>Sequences</em> puis sélectionnez votre fichier débutant par <em>seq_user</em>, puis cliquez sur <em>save</em>.</p>
 					<p><strong>Note:</strong> vous ne pouvez pas sauvegarder votre <a href="#unit_sequence">séquence</a> sur le fichier <em>seq_MountainKing.txt</em>, <em>seq_RideWalkyries.txt</em> ou <em>seq_userEmpty.txt</em> car il s'agit de <a href="#unit_sequence">séquences</a> "template".</p>
 					<p><strong>Note:</strong> le nom de l'auteur sera automatiquement assigné à vous, soit Allo_Machines.</p>
 				</li>
-				<li><h3 id="cmd_open">Ouvrir <img src="icones/load.svg" alt="ouvrir"></h3>
+				<li><h3 id="cmd_open">Ouvrir <img src="../icones/load.svg" alt="ouvrir"></h3>
 					<p>Vous permet d'ouvrir une <a href="#unit_sequence">séquence</a> de votre choix.</p>
 					<p>Naviguez dans le dossier <em>Sequences</em> puis sélectionnez votre fichier débutant par <em>seq_user</em>, puis cliquez sur <em>open</em>.</p>
 					<p>Vous pouvez ouvrir <em>seq_MountainKing.txt</em> ou <em>seq_RideWalkyries.txt</em> pour une <a href="#unit_sequence">séquence</a> prête à être jouée.</p>
 					<p>Vous pouvez ouvrir <em>seq_userEmpty.txt</em> (au bas de la liste) pour une <a href="#unit_sequence">séquence</a> complètement vide.</p>
 				</li>
-				<li><h3 id="cmd_revert">Recharger <img src="icones/revert.svg" alt="revert"></h3>
+				<li><h3 id="cmd_revert">Recharger <img src="../icones/revert.svg" alt="revert"></h3>
 					<p>Vous permet d'annuler toutes les modifications et de recharger la <a href="#unit_sequence">séquence</a> originalement chargée.</p>
 				</li>
-				<li><h3 id="cmd_info">Info <img src="icones/info.svg" alt="arrêt"></h3>
+				<li><h3 id="cmd_info">Info <img src="../icones/info.svg" alt="arrêt"></h3>
 					<p>Vous permet de lire cette superbe page.</p>
 				</li>
-				<li><h3 id="cmd_on">Jouer <img src="icones/play.svg" alt="jouer"> / arrêt <img src="icones/stop.svg" alt="arrêt"> </h3>
-					<p>Vous permet de faire défiler ou arrêter le <a href="#ind_cursor">curseur</a> dans la <a href="#unit_sequence">séquence</a></p>
+				<li><h3 id="cmd_on">Jouer <img src="../icones/play.svg" alt="jouer"> / arrêt <img src="../icones/stop.svg" alt="arrêt"> </h3>
+					<p>Vous permet de faire défiler ou arrêter le <a href="#ind_pos">curseur</a> dans la <a href="#unit_sequence">séquence</a>.</p>
 				</li>
 				<li><h3 id="cmd_title">Titre</h3>
-					<p>Vous permet de donner un nom à votre <a href="#unit_sequence">séquence</a></p>
+					<p>Vous permet de donner un nom à votre <a href="#unit_sequence">séquence</a>.</p>
 				</li>
-				<li><h3 id="cmd_tempo">Tempo <img src="icones/tempo.svg" alt="tempo"></h3>
+				<li><h3 id="cmd_tempo">Tempo <img src="../icones/tempo.svg" alt="tempo"></h3>
 					<p>Vous permet d'ajuster la vitesse à laquelle le curseur défile dans la <a href="#unit_sequence">séquence</a> (voir <a href="#unit_tempo">tempo</a>).</p>
+					<p>Glissez de haut en bas pour ajuster la valeur</p>
+					<p>Double-cliquez pour remettre la valeur par défaut (<strong>120</strong>)</p>
+					<p>La valeur va de <strong>1</strong> à <strong>480</strong></p>
 				</li>
 				<li><h3 id="cmd_ts">Signature temporelle</h3>
 					<p>Vous permet de modifier la signature temporelle de la <a href="#unit_sequence">séquence</a></p>
@@ -220,12 +276,28 @@
 						<li><h3 id="cmd_ts_n">Numérateur</h3>
 							<p>Détermine le nombre de <a href="#unit_beat">battements</a> dans une <a href="#unit_measure">mesure</a>.</p>
 							<p>Glissez de haut en bas pour ajuster la valeur</p>
-							<p>Double-cliquez pour remettre par défaut</p>
+							<p>Double-cliquez pour remettre la valeur par défaut (<strong>4</strong>)</p>
+							<p>La valeur va de <strong>1</strong> à <strong>32</strong></p>
 						</li>
-						<li><h3 id="cmd_ts_n">Dénominateur</h3>
+						<li><h3 id="cmd_ts_d">Dénominateur</h3>
 							<p>Détermine la durée d'un <a href="#unit_beat">battement</a> selon une fraction de longueur (voir <a href="#unit_beat">battement</a>).</p>
+							<p>Les choix sont:
+								<ul>
+									<li>16</li>
+									<li>8</li>
+									<li>4</li>
+									<li>2</li>
+									<li>1</li>
+								</ul>
+							</p>
 						</li>
 					</ul>
+				</li>
+				<li><h3 id="cmd_loop_length">Longueur de boucle <img src="../icones/loop.svg" alt="tempo"></h3>
+					<p>Vous permet de déterminer le nombre de <a href="unit_measure">mesures</a> par <a href="unit_page">page</a>.</p>
+					<p>Glissez de haut en bas pour ajuster la valeur</p>
+					<p>Double-cliquez pour remettre la valeur par défaut (<strong>4</strong>)</p>
+					<p>La valeur va de <strong>1</strong> à <strong>32</strong></p>
 				</li>
 			</ul>
 		</div>
@@ -233,6 +305,12 @@
 	<section id="tuto_interface">
 		<div id="interface_cont">
 			<img id="interface" src="interface.png" alt="disposition de l'interface">
+			<a href="#cmd_vol" class="cmd_vol"><h3>Volume</h3></a>
+			<a href="#ind_pos" class="ind_pos"><h3>Curseur</h3></a>
+			<a href="#ind_range" class="ind_range"><h3>Boucle</h3></a>
+			<a href="#cmd_save" class="cmd_save"><h3>Sauvegarder</h3></a>
+
+			<a href="#cmd_keyboard" class="cmd_keyboard"><h3>Clavier</h3></a>
 		</div>
 	</section>
 </body>
